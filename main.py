@@ -17,8 +17,8 @@ if config.telegram.startup_msg:
     telegram_bot.send_message(config.telegram.chat_id, 'Bot starting up.')
 
 def checkNetworkDevices(session):
-    devices = session.get(f"{config.unifi.hostname}/proxy/network/v2/api/site/default/clients/active", params={ 'includeTrafficUsage': False, 'includeUnifiDevices': False}).json()
-    
+    devices = session.get(f"{config.unifi.hostname}/proxy/network/v2/api/site/default/clients/active", params={ 'includeTrafficUsage': False, 'includeUnifiDevices': False}, verify=False).json()
+
     count = 0
     device_msg = ""
     for device in devices:
@@ -26,8 +26,6 @@ def checkNetworkDevices(session):
             count += 1
             device_msg += f"{device['display_name']} & "
 
-
-    logger.debug(f"Detected {count} device(s) in network.")
     if count > 0:
         return device_msg.rstrip(" & ")
     else:
@@ -42,9 +40,9 @@ def main():
         exit()
 
     while True:
-        
+
         # 2. Get Latest motions detected.
-        latestMotionsDetected = session.get(f"{config.unifi.hostname}/proxy/protect/api/events", params={ 'allCameras': True, 'limit': 5, 'orderDirection': 'DESC', 'types': 'motion'})
+        latestMotionsDetected = session.get(f"{config.unifi.hostname}/proxy/protect/api/events", params={ 'allCameras': True, 'limit': 5, 'orderDirection': 'DESC', 'types': 'motion'}, verify=False)
         logger.info('Checking latest video motions.')
 
         # get video info success
@@ -61,14 +59,13 @@ def main():
 
             logger.info(f"Found new video: {video['id']}")
 
-            file_motion = session.get(f'{config.unifi.hostname}/proxy/protect/api/video/export', params={'camera': config.protect.camera, 'channel': 0, 'start': video['start'], 'end': video['end']})
+            file_motion = session.get(f'{config.unifi.hostname}/proxy/protect/api/video/export', params={'camera': config.protect.camera, 'channel': 0, 'start': video['start'], 'end': video['end']}, verify=False)
             if file_motion.status_code != 200:
                 logger.warning('Download video failed - Will retry next round.')
                 continue
             try:
 
                 # Insert into database
-                logger.debug(f"Inserting {video['id']} into video history.")
                 db.insert({'id': video['id']})
 
                 # If devices is detected on Wifi, then no need to send a message.
