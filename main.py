@@ -59,12 +59,10 @@ def main():
 
             logger.info(f"Found new video: {video['id']}")
 
-            # Insert into database
-            db.insert({'id': video['id']})
-
             # If devices is detected on Wifi, then no need to send a message.
             devices = checkNetworkDevices(session)
             if devices != "":
+                db.insert({'id': video['id']})
                 logger.info(f"Found following device(s) on Wifi: {devices}, so no need to send video.")
                 continue
 
@@ -72,11 +70,12 @@ def main():
             if file_motion.status_code != 200:
                 logger.warning('Download video failed - Will retry next round.')
                 continue
-            
+
             try:
                 logger.info('Download done, so lets send it to Telegram channel.')
                 telegram_bot.send_video(config.telegram.chat_id, file_motion.content)
                 logger.info(f"Video {video['id']} sent.")
+                db.insert({'id': video['id']})
             
             except Exception:
                 logger.error('Failed to send video to Telegram. Maybe a network issue?')
