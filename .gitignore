@@ -1,0 +1,6 @@
+# Python
+*.pyc
+
+# Bot stuff
+config.toml
+video_history.json
