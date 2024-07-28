@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  unifi-protect-telegram-bot:
+    image: ghcr.io/cronick/unifi-protect-telegram-bot:latest
+    container_name: unifi-protect-telegram-bot
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/config.toml:/app/config.toml
