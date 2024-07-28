@@ -59,24 +59,25 @@ def main():
 
             logger.info(f"Found new video: {video['id']}")
 
+            # Insert into database
+            db.insert({'id': video['id']})
+
+            # If devices is detected on Wifi, then no need to send a message.
+            devices = checkNetworkDevices(session)
+            if devices != "":
+                logger.info(f"Found following device(s) on Wifi: {devices}, so no need to send video.")
+                continue
+
             file_motion = session.get(f'{config.unifi.hostname}/proxy/protect/api/video/export', params={'camera': config.protect.camera, 'channel': 0, 'start': video['start'], 'end': video['end']}, verify=False)
             if file_motion.status_code != 200:
                 logger.warning('Download video failed - Will retry next round.')
                 continue
+            
             try:
-
-                # Insert into database
-                db.insert({'id': video['id']})
-
-                # If devices is detected on Wifi, then no need to send a message.
-                devices = checkNetworkDevices(session)
-                if devices != "":
-                    logger.info(f"Found following device(s) on Wifi: {devices}, so no need to send video.")
-                    continue
-
                 logger.info('Download done, so lets send it to Telegram channel.')
                 telegram_bot.send_video(config.telegram.chat_id, file_motion.content)
                 logger.info(f"Video {video['id']} sent.")
+            
             except Exception:
                 logger.error('Failed to send video to Telegram. Maybe a network issue?')
 
