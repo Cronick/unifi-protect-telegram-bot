@@ -7,3 +7,4 @@ services:
     volumes:
       - ${PWD}/config.toml:/app/config.toml
       - ${PWD}/video_history.json:/app/video_history.json
+      - /etc/localtime:/etc/localtime:ro
