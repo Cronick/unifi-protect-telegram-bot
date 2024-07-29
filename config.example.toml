@@ -2,15 +2,12 @@
 hostname = "https://192.168.0.1"
 username = ""
 password = ""
-interval = 10
+check_interval = 10
 
 [network]
 devices = [
     "00:00:00:00:00:00" # Example-Device
 ]
-
-[protect]
-camera = "XXXXXXXXXXXXXXXXXXXXXXXX"
 
 [telegram]
 bot_token = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXX"

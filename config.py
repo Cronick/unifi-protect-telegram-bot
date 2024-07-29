@@ -8,13 +8,10 @@ class Unifi(BaseModel):
     hostname: str
     username: str
     password: str
-    interval: int
+    check_interval: int
 
 class Network(BaseModel):
     devices: list
-
-class Protect(BaseModel):
-    camera: str
 
 class Telegram(BaseModel):
     bot_token: str
@@ -24,7 +21,6 @@ class Telegram(BaseModel):
 class Config(BaseModel):
     unifi: Unifi
     network: Network
-    protect: Protect
     telegram: Telegram
 
 
