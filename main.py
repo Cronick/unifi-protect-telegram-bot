@@ -20,9 +20,10 @@ def getCameraList(session) -> list:
     devices = session.get(f"{config.unifi.hostname}/proxy/protect/api/bootstrap", verify=False).json()
     camerasIds = []
     camerasName = []
-    for camera in devices['cameras']:
-        camerasIds.append(camera['id'])
-        camerasName.append(camera['name'])
+    if "cameras" in devices:
+        for camera in devices['cameras']:
+            camerasIds.append(camera['id'])
+            camerasName.append(camera['name'])
     return camerasIds, camerasName
 
 def getCameraName(session, camera_id) -> str:
