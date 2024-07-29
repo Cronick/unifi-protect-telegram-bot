@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the script into the container
 COPY . .
 
+# Create default file for TinyDB
+RUN touch /app/video_history.json
+
 # Install any necessary libraries
 RUN pip install -r requirements.txt
 
