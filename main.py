@@ -24,6 +24,11 @@ def getCameraList(session) -> list:
         for camera in devices['cameras']:
             camerasIds.append(camera['id'])
             camerasName.append(camera['name'])
+
+    if len(camerasIds) == 0:
+        logger.warning("No cameras found!")
+        print(devices)
+
     return camerasIds, camerasName
 
 def getCameraName(session, camera_id) -> str:
@@ -56,11 +61,12 @@ def main():
         logger.error(f"Error message from Unifi: {login.json()}")
         exit()
 
+    cameraIds, cameraNames = getCameraList(session)
+
     while True:
 
-        cameraIds, cameraNames = getCameraList(session)
         logger.info(f"Checking latest video motions on cameras: {', '.join(cameraNames)}")
-        
+
         for camera in cameraIds:
 
             # Get Latest motions detected.
