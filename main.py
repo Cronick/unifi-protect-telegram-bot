@@ -27,7 +27,6 @@ def getCameraList(session) -> list:
 
     if len(camerasIds) == 0:
         logger.warning("No cameras found!")
-        print(devices)
 
     return camerasIds, camerasName
 
