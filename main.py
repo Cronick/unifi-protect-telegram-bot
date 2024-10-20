@@ -32,9 +32,10 @@ def getCameraList(session) -> list:
 
 def getCameraName(session, camera_id) -> str:
     devices = session.get(f"{config.unifi.hostname}/proxy/protect/api/bootstrap", verify=False).json()
-    for camera in devices['cameras']:
-        if camera['id'] == camera_id:
-            return camera['name']
+    if "cameras" in devices:
+        for camera in devices['cameras']:
+            if camera['id'] == camera_id:
+                return camera['name']
     return ""
 
 def checkNetworkDevices(session) -> str:
@@ -67,6 +68,11 @@ def main():
         logger.info(f"Checking latest video motions on cameras: {', '.join(cameraNames)}")
 
         for camera in cameraIds:
+
+            # Check if cameraIds is empty.
+            if len(cameraIds) == 0:
+                logger.warning("No cameras found!")
+                main()
 
             # Get Latest motions detected.
             latestMotionsDetected = session.get(f"{config.unifi.hostname}/proxy/protect/api/events", params={ 'allCameras': True, 'cameras': camera, 'limit': 5, 'orderDirection': 'DESC', 'types': 'motion'}, verify=False)
